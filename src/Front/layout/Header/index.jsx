@@ -8,9 +8,9 @@ const Header = () => {
           <div>
             <Link to="/">
               <img alt="logo" loading="lazy" width="150" height="68" decoding="async" data-nimg="1" className="block dark:hidden" 
-                style={{ color: 'transparent' }} src="/assets/images/dark-logo.svg" />
+                style={{ color: 'transparent' }} src="/src/assets/front/images/dark-logo.svg" />
               <img alt="logo" loading="lazy" width="150" height="68" decoding="async" data-nimg="1" className="block dark:hidden"
-                style={{ color: 'transparent' }} src="/assets/images/logo.svg" />
+                style={{ color: 'transparent' }} src="/src/assets/front/images/logo.svg" />
             </Link>
           </div>
           <div className="flex items-center gap-2 sm:gap-6">
