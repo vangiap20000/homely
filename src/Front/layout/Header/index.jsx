@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { getImageUrlFront, getIconGlobal } from "../../../utils/getAssets";
 
 const Header = () => {
   return (
@@ -8,19 +9,19 @@ const Header = () => {
           <div>
             <Link to="/">
               <img alt="logo" loading="lazy" width="150" height="68" decoding="async" data-nimg="1" className="block dark:hidden" 
-                style={{ color: 'transparent' }} src="/src/assets/front/images/dark-logo.svg" />
+                style={{ color: 'transparent' }} src={getImageUrlFront("dark-logo.svg")} />
               <img alt="logo" loading="lazy" width="150" height="68" decoding="async" data-nimg="1" className="block dark:hidden"
-                style={{ color: 'transparent' }} src="/src/assets/front/images/logo.svg" />
+                style={{ color: 'transparent' }} src={getImageUrlFront("logo.svg")} />
             </Link>
           </div>
           <div className="flex items-center gap-2 sm:gap-6">
             <button className="hover:cursor-pointer">
-              <img alt="icon" loading="lazy" decoding="async" src="/assets/global/icons/sun.svg" />
+              <img alt="icon" loading="lazy" decoding="async" src={getIconGlobal("sun.svg")} />
               {/* <img alt="icon" loading="lazy" decoding="async" src="/assets/global/icons/moon.svg" /> */}
             </button>
-            <div class="hidden md:block">
+            <div className="hidden md:block">
                <Link to="#" className="text-base text-inherit flex items-center gap-2 border-r pr-6 text-dark hover:text-primary">
-                 <img alt="icon" loading="lazy" decoding="async" src="/assets/global/icons/phone.svg" />
+                 <img alt="icon" loading="lazy" decoding="async" src={getIconGlobal("phone.svg")} />
                  +1-212-456-789
                </Link>
             </div>
