@@ -2,3 +2,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #000000;
+    --primary: #0097FB;
+    --dark: #1a1a1a;
+  }
+}
+
+@layer components {
+  :host {
+    color: var(--foreground);
+    background: var(--background);
+  }
+}
