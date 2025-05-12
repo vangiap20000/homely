@@ -1,14 +1,95 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@tailwind screens;
+@plugin "flowbite/plugin";
+
+*, ::backdrop, ::after, ::before {
+    box-sizing: border-box;
+    border: 0 solid;
+    margin: 0;
+    padding: 0;
+}
+
+button, input, optgroup, select, textarea {
+    font: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    opacity: 1;
+    background-color: #0000;
+    border-radius: 0;
+}
 
 @layer base {
-  :root {
-    --background: #ffffff;
-    --foreground: #000000;
-    --primary: #0097FB;
-    --dark: #1a1a1a;
+  :host,:roo {
+    --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --color-yellow-500: oklch(.795 .184 86.047);
+    --color-gray-300: oklch(.872 .01 258.338);
+    --color-gray-400: oklch(.707 .022 261.325);
+    --color-black: #000;
+    --color-white: #fff;
+    --spacing: .25rem;
+    --breakpoint-md: 48rem;
+    --breakpoint-xl: 80rem;
+    --container-xs: 20rem;
+    --container-2xl: 42rem;
+    --text-sm: .875rem;
+    --text-sm--line-height: calc(1.25 / .875);
+    --text-base: 1rem;
+    --text-base--line-height: calc(1.5 / 1);
+    --text-lg: 1.125rem;
+    --text-lg--line-height: calc(1.75 / 1.125);
+    --text-xl: 1.25rem;
+    --text-xl--line-height: calc(1.75 / 1.25);
+    --text-2xl: 1.5rem;
+    --text-2xl--line-height: calc(2 / 1.5);
+    --text-3xl: 1.875rem;
+    --text-3xl--line-height: calc(2.25 / 1.875);
+    --text-4xl: 2.25rem;
+    --text-4xl--line-height: calc(2.5 / 2.25);
+    --text-5xl: 3rem;
+    --text-5xl--line-height: 1;
+    --text-6xl: 3.75rem;
+    --text-6xl--line-height: 1;
+    --text-9xl: 6.5rem;
+    --text-9xl--line-height: 1;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --tracking-tighter: -.05em;
+    --tracking-tight: -.025em;
+    --tracking-wider: .05em;
+    --leading-loose: 2;
+    --radius-md: .375rem;
+    --radius-lg: .5rem;
+    --radius-2xl: 1rem;
+    --radius-3xl: 1.5rem;
+    --ease-in: cubic-bezier(.4,0,1,1);
+    --ease-in-out: cubic-bezier(.4,0,.2,1);
+    --default-transition-duration: .15s;
+    --default-transition-timing-function: cubic-bezier(.4,0,.2,1);
+    --default-font-family: var(--font-sans);
+    --default-font-feature-settings: var(--font-sans--font-feature-settings);
+    --default-font-variation-settings: var(--font-sans--font-variation-settings);
+    --default-mono-font-family: var(--font-mono);
+    --default-mono-font-feature-settings: var(--font-mono--font-feature-settings);
+    --default-mono-font-variation-settings: var(--font-mono--font-variation-settings);
+    --color-primary: #07be8a;
+    --color-skyblue: #79adff;
+    --color-lightskyblue: #9cc2dd;
+    --color-dark: #172023;
+    --text-xm: 1.125rem;
+    --text-40: 2.5rem;
+    --text-52: 3.25rem;
+    --spacing-45p: 45%;
+    --spacing-68: 17.375rem;
+    --spacing-540: 33.75rem;
+    --spacing-8xl: 87.5rem;
+    --animate-slide: slide 20s linear infinite;
   }
 }
 
@@ -17,4 +98,81 @@
     color: var(--foreground);
     background: var(--background);
   }
+}
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --color-yellow-500: oklch(.795 .184 86.047);
+  --color-gray-300: oklch(.872 .01 258.338);
+  --color-gray-400: oklch(.707 .022 261.325);
+  --color-black: #000;
+  --color-white: #fff;
+  --spacing: .25rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-xs: 23.438rem;
+  --breakpoint-2xl: 100rem;
+  --breakpoint-3xl: 120rem;
+  --breakpoint-mobile: 32.5rem;
+  --container-xs: 20rem;
+  --container-2xl: 42rem;
+  --text-sm: .875rem;
+  --text-sm--line-height: calc(1.25 / .875);
+  --text-base: 1rem;
+  --text-base--line-height: calc(1.5 / 1);
+  --text-lg: 1.125rem;
+  --text-lg--line-height: calc(1.75 / 1.125);
+  --text-xl: 1.25rem;
+  --text-xl--line-height: calc(1.75 / 1.25);
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: calc(2 / 1.5);
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: calc(2.25 / 1.875);
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: calc(2.5 / 2.25);
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1;
+  --text-9xl: 6.5rem;
+  --text-9xl--line-height: 1;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --tracking-tighter: -.05em;
+  --tracking-tight: -.025em;
+  --tracking-wider: .05em;
+  --leading-loose: 2;
+  --radius-md: .375rem;
+  --radius-lg: .5rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --ease-in: cubic-bezier(.4,0,1,1);
+  --ease-in-out: cubic-bezier(.4,0,.2,1);
+  --default-transition-duration: .15s;
+  --default-transition-timing-function: cubic-bezier(.4,0,.2,1);
+  --default-font-family: var(--font-sans);
+  --default-font-feature-settings: var(--font-sans--font-feature-settings);
+  --default-font-variation-settings: var(--font-sans--font-variation-settings);
+  --default-mono-font-family: var(--font-mono);
+  --default-mono-font-feature-settings: var(--font-mono--font-feature-settings);
+  --default-mono-font-variation-settings: var(--font-mono--font-variation-settings);
+  --color-primary: #07be8a;
+  --color-skyblue: #79adff;
+  --color-lightskyblue: #9cc2dd;
+  --color-dark: #172023;
+  --text-xm: 1.125rem;
+  --text-40: 2.5rem;
+  --text-52: 3.25rem;
+  --spacing-45p: 45%;
+  --spacing-68: 17.375rem;
+  --spacing-540: 33.75rem;
+  --spacing-8xl: 87.5rem;
+  --animate-slide: slide 20s linear infinite;
+  --breakpoint-sm: 30rem;
+  --breakpoint-lg: 64rem;
+  --inset-shadow-lp: 0 10px 15px -3px var(--tw-shadow-color, #0000001a), 0 4px 6px -4px var(--tw-shadow-color, #0000001a);; 
+  
 }
