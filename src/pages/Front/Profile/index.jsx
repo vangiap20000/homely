@@ -47,7 +47,7 @@ const Profile = () => {
         </div>
 
         {/* Profile Section */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-black/10 dark:border-white/10 p-6 lg:p-8 mb-8">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-black/10 dark:border-white/10 p-6 lg:p-8 mb-8 shadow-xl dark:shadow-white/10">
           <h3 className="text-2xl font-semibold text-black dark:text-white mb-6">Profile</h3>
           
           <form onSubmit={handleUpdateProfile}>
@@ -93,7 +93,7 @@ const Profile = () => {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-lg outline-primary focus:outline bg-white dark:bg-gray-800 text-black dark:text-white"
+                    className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-lg outline-primary focus:outline bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   />
                 </div>
                 <div>
@@ -106,7 +106,7 @@ const Profile = () => {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-lg outline-primary focus:outline bg-white dark:bg-gray-800 text-black dark:text-white"
+                    className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-lg outline-primary focus:outline bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   />
                 </div>
               </div>
@@ -123,7 +123,7 @@ const Profile = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-lg outline-primary focus:outline bg-white dark:bg-gray-800 text-black dark:text-white"
+                    className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-lg outline-primary focus:outline bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   />
                 </div>
                 <div>
@@ -136,7 +136,7 @@ const Profile = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-lg outline-primary focus:outline bg-white dark:bg-gray-800 text-black dark:text-white"
+                    className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-lg outline-primary focus:outline bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   />
                 </div>
               </div>
@@ -152,7 +152,7 @@ const Profile = () => {
         </div>
 
         {/* Password Section */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-black/10 dark:border-white/10 p-6 lg:p-8 mb-8">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-black/10 dark:border-white/10 p-6 lg:p-8 mb-8 shadow-xl dark:shadow-white/10">
           <h3 className="text-2xl font-semibold text-black dark:text-white mb-6">Password</h3>
           
           <form onSubmit={handleChangePassword}>
@@ -167,7 +167,7 @@ const Profile = () => {
                   id="currentPassword"
                   value={formData.currentPassword}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-lg outline-primary focus:outline bg-white dark:bg-gray-800 text-black dark:text-white"
+                  className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-lg outline-primary focus:outline bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                 />
               </div>
               
@@ -181,7 +181,7 @@ const Profile = () => {
                   id="newPassword"
                   value={formData.newPassword}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-lg outline-primary focus:outline bg-white dark:bg-gray-800 text-black dark:text-white"
+                  className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-lg outline-primary focus:outline bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                 />
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                   Your password must have at least 8 characters, include one uppercase letter, and one number.
@@ -198,7 +198,7 @@ const Profile = () => {
                   id="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-lg outline-primary focus:outline bg-white dark:bg-gray-800 text-black dark:text-white"
+                  className="w-full px-4 py-3 border border-black/10 dark:border-white/10 rounded-lg outline-primary focus:outline bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                 />
               </div>
             </div>
@@ -213,7 +213,7 @@ const Profile = () => {
         </div>
 
         {/* Danger Zone */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-red-200 dark:border-red-800 p-6 lg:p-8">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-red-200 dark:border-red-800 p-6 lg:p-8 shadow-xl dark:shadow-white/10">
           <h3 className="text-2xl font-semibold text-red-600 dark:text-red-400 mb-6">Danger zone</h3>
           
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
