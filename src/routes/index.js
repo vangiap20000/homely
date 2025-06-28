@@ -1,13 +1,13 @@
 import { useEffect } from "react";
-import { useRoutes } from "react-router-dom";
-import { useLocation, matchRoutes } from "react-router-dom";
+import { useRoutes, useLocation, matchRoutes, useNavigationType   } from "react-router-dom";
 import frontRoutes from "./web";
 import AdminRoutes from "./admin";
 
 export default function AppRoute() {
   const location = useLocation();
+  const navigationType = useNavigationType();
   const routes = [frontRoutes, AdminRoutes];
-  
+
   useEffect(() => {
     const matched = matchRoutes(routes, location);
 
@@ -20,6 +20,13 @@ export default function AppRoute() {
       }
     }
   }, [location]);
+
+  useEffect(() => {
+    if (navigationType === "PUSH") {
+      window.scrollTo({ top: 0, left: 0});
+    }
+  }, [location, navigationType]);
+
 
   return useRoutes(routes);
 }

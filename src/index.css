@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 @tailwind screens;
-@plugin "flowbite/plugin";
 
 *, ::backdrop, ::after, ::before {
     box-sizing: border-box;

@@ -1,14 +1,15 @@
 import { Link } from "react-router-dom";
+import Image from "../Image";
 
 const Card = ({ item, index }) => {
   return (
     <div
       key={index}
-      className={`${index < 2 ? "lg:col-span-6" : "lg:col-span-3"} col-span-12 sm:col-span-6`}
+      className={`${index < 2 ? "lg:col-span-6 col-span-12" : "lg:col-span-3 col-span-6"}`}
     >
       <div className="relative rounded-2xl overflow-hidden group">
-        <Link to={item.href}>
-          <img
+        <Link to={item.slug}>
+          <Image
             alt="property"
             loading="lazy"
             width="680"
@@ -20,7 +21,7 @@ const Card = ({ item, index }) => {
           />
         </Link>
         <Link
-          to={item.href}
+          to={item.slug}
           className="absolute w-full h-full bg-gradient-to-b from-black/0 to-black/80 top-full flex flex-col justify-between pl-10 pb-10 group-hover:top-0 duration-500"
         >
           <div className="flex justify-end mt-6 mr-6">
