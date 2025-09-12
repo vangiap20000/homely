@@ -15,15 +15,15 @@ const Register = () => {
         <div className="mb-[22px]">
           <input
             type="text"
-            name="name"
-            placeholder="Name"
+            name="firstName"
+            placeholder="firstName"
             className={
               `w-full rounded-2xl border placeholder:text-gray-400 border-black/10 dark:border-white/20 border-solid bg-transparent px-5 py-3 text-base text-dark outline-none transition focus:border-primary focus-visible:shadow-none dark:border-border_color dark:text-white dark:focus:border-primary border-stroke` +
-              (errors.name ? " !border-red-500" : "")
+              (errors.firstName ? " !border-red-500" : "")
             }
-            {...register("name", { required: true, maxLength: 255 })}
+            {...register("firstName", { required: true, maxLength: 255 })}
           />
-          {errors.name && (
+          {errors.firstName && (
             <span className="text-red-500 text-xs">Name is required.</span>
           )}
         </div>
@@ -91,10 +91,10 @@ const Register = () => {
           Policy
         </Link>
       </p>
-      <p class="text-center text-base">
+      <p className="text-center text-base">
         Already have an account?
         <Link
-          class="pl-2 text-primary hover:bg-darkprimary hover:underline"
+          className="pl-2 text-primary hover:bg-darkprimary hover:underline"
           to="/login"
         >
           Sign In

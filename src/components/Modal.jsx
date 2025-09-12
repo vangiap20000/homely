@@ -1,4 +1,4 @@
-import { getIconGlobal } from "../../utils/getAssets";
+import { getIconGlobal } from "../utils/getAssets";
 
 const Modal = ({
   isOpen,
