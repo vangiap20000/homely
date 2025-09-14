@@ -1,6 +1,39 @@
 import { getImageUrlFront, getIconGlobal } from "../../../../utils/getAssets";
+import { useDispatch, useSelector } from 'react-redux';
+import { googleLogin } from '../../../../store/authSlice';
+import { loading } from "../../../../store/loadingSlice";
+import { useNavigate } from 'react-router-dom';
+import { doc, collection, setDoc, getDoc } from "firebase/firestore";
+import { db } from "../../../../firebase";
 
 const Form = ({ children, isSoicalLogin = true }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleGoogleLogin = async () => {
+    dispatch(loading(true));
+    const result = await dispatch(googleLogin());
+    if (googleLogin.fulfilled.match(result)) {
+      const user = result.payload;
+      const ref = doc(db, 'users', user.uid);
+      const userDocSnap = await getDoc(ref);
+      if (!userDocSnap.exists()) {
+        const usersCol = collection(db, "users");
+        const userRef = doc(usersCol, user.uid);
+        await setDoc(userRef, {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          phoneNumber: user.phoneNumber || null,
+          createdAt: new Date()
+        });
+      }
+      navigate('/profile');
+    }
+    dispatch(loading(false));
+  };
+
   return (
     <section className="pt-44">
       <div className="p-16 container mx-auto max-w-540 py-5 rounded-2xl shadow-auth dark:shadow-dark-auth">
@@ -29,12 +62,16 @@ const Form = ({ children, isSoicalLogin = true }) => {
         {isSoicalLogin && (
           <>
             <div className="flex gap-4">
-              <button className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-black/10 dark:border-white/20 p-3.5 text-dark duration-200 ease-in dark:text-white dark:hover:bg-primary/10 hover:bg-primary/10 cursor-pointer">
+              <button
+                onClick={handleGoogleLogin}
+                className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-black/10 dark:border-white/20 p-3.5 text-dark duration-200 ease-in dark:text-white dark:hover:bg-primary/10 hover:bg-primary/10 cursor-pointer">
                 Sign In
                 <img src={getIconGlobal("google.svg")} alt="google" />
               </button>
 
-              <button className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-black/10 dark:border-white/20 p-3.5 text-dark duration-200 ease-in dark:text-white dark:hover:bg-primary/10 hover:bg-primary/10 cursor-pointer">
+              <button
+                onClick={handleGoogleLogin}
+                className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-black/10 dark:border-white/20 p-3.5 text-dark duration-200 ease-in dark:text-white dark:hover:bg-primary/10 hover:bg-primary/10 cursor-pointer">
                 Sign In
                 <img src={getIconGlobal("github.svg")} alt="github" />
               </button>
@@ -45,6 +82,7 @@ const Form = ({ children, isSoicalLogin = true }) => {
                 OR
               </span>
             </span>{" "}
+            { }
           </>
         )}
         {children}

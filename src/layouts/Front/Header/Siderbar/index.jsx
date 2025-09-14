@@ -1,10 +1,20 @@
 import { getIconGlobal } from "../../../../utils/getAssets";
 import { Link } from "react-router-dom"
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from "../../../../store/authSlice";
+import { showToast } from '../../../../store/toastSlice';
 
-const Sidebar = ({open, close}) => {
+const Sidebar = ({ open, close }) => {
   const setClose = () => {
     close()
   }
+  const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
+  const handleLogout = () => {
+    dispatch(logout());
+    setClose();
+    dispatch(showToast({ message: 'Logout successful!', type: 'success' }));
+  };
   return (
     <>
       {open && <div className="fixed top-0 left-0 w-full h-full bg-black/50 z-40" onClick={setClose}></div>}
@@ -42,19 +52,31 @@ const Sidebar = ({open, close}) => {
                     Contact
                   </Link>
                 </li>
-                <li className="flex items-center group w-fit">
+                {/* <li className="flex items-center group w-fit">
                   <div className="w-0 h-0.5 bg-primary transition-all duration-300 group-hover:block group-hover:w-6 group-hover:mr-4"></div>
                   <Link to="#" className="py-3 text-3xl sm:text-5xl font-medium text-white/40 rounded-full group-hover:text-primary" onClick={setClose}>
                     Docs
                   </Link>
-                </li>
+                </li> */}
                 <li className="flex items-center gap-4">
-                  <Link to="/login" className="py-4 px-8 bg-primary text-base leading-4 block w-fit text-white rounded-full border border-primary font-semibold mt-3 hover:bg-transparent hover:text-primary duration-300" onClick={setClose}>
-                    Sign In
-                  </Link>
-                  <Link to="/signup" className="py-4 px-8 bg-transparent border border-primary text-base leading-4 block w-fit text-primary rounded-full font-semibold mt-3 hover:bg-primary hover:text-white duration-300" onClick={setClose}>
-                    Sign up
-                  </Link>
+                  {user
+                    ? (
+                      <button className="cursor-pointer py-4 px-8 bg-primary text-base leading-4 block w-fit text-white rounded-full border border-primary font-semibold mt-3 hover:bg-transparent hover:text-primary duration-300"
+                        onClick={handleLogout}
+                      >
+                        Logout
+                      </button>
+                    ) :
+                    (
+                      <>
+                        <Link to="/login" className="py-4 px-8 bg-primary text-base leading-4 block w-fit text-white rounded-full border border-primary font-semibold mt-3 hover:bg-transparent hover:text-primary duration-300" onClick={setClose}>
+                          Sign In
+                        </Link>
+                        <Link to="/signup" className="py-4 px-8 bg-transparent border border-primary text-base leading-4 block w-fit text-primary rounded-full font-semibold mt-3 hover:bg-primary hover:text-white duration-300" onClick={setClose}>
+                          Sign up
+                        </Link>
+                      </>
+                    )}
                 </li>
               </ul>
             </nav>

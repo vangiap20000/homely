@@ -128,3 +128,13 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# firebase
+.firebase/
+firebase.json
+package.json
+package-lock.json
+postcss.config.js
+tailwind.config.js
+tsconfig.json
+vite.config.js

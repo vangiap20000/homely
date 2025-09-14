@@ -1,6 +1,13 @@
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Form from "./__components/Form";
+import { useDispatch, useSelector } from 'react-redux';
+import { registerUser, loginUser } from '../../../store/authSlice';
+import { showToast } from '../../../store/toastSlice';
+import { loading } from "../../../store/loadingSlice";
+import { useEffect } from "react";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../../../firebase";
 
 const Register = () => {
   const {
@@ -8,11 +15,39 @@ const Register = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const onSubmit = (data) => console.log(data);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { error } = useSelector((state) => state.auth);
+  const onSubmit = async (data) => {
+    dispatch(loading(true));
+    const result = await dispatch(registerUser({ email: data.email, password: data.password }));
+    if (registerUser.fulfilled.match(result)) {
+      const userRegister = result.payload;
+      await dispatch(loginUser({ email: data.email, password: data.password }));
+      const userRef = doc(db, "users", userRegister.uid);
+      await setDoc(userRef, {
+        uid: userRegister.uid,
+        email: userRegister.email,
+        createdAt: new Date()
+      });
+      dispatch(loading(false));
+      navigate('/profile');
+      dispatch(showToast({ message: 'Registration successful!', type: 'success' }));
+    }
+    dispatch(loading(false));
+  }
+  useEffect(() => {
+    if (error) {
+      dispatch(showToast({ message: 'Registration failed, please try again.', type: 'error' }));
+    }
+  }, [error, dispatch]);
   return (
     <Form>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="mb-[22px]">
+        {error && <p className="text-red-500 text-sm mb-4">
+          {error == "Firebase: Error (auth/email-already-in-use)." ? "Email already in use" : "Signup fail please try again"}
+        </p>}
+        {/* <div className="mb-[22px]">
           <input
             type="text"
             name="firstName"
@@ -26,7 +61,7 @@ const Register = () => {
           {errors.firstName && (
             <span className="text-red-500 text-xs">Name is required.</span>
           )}
-        </div>
+        </div> */}
 
         <div className="mb-[22px]">
           <input

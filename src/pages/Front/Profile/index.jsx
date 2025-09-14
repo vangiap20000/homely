@@ -1,15 +1,37 @@
 import { useForm } from "react-hook-form";
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import { getImageUrlGlobal } from "../../../utils/getAssets";
 import Modal from "../../../components/Modal";
 import { useGlobalConfirm } from "../../../contexts/ConfirmContext";
+import { useSelector, useDispatch } from "react-redux";
+import { auth, db } from "../../../firebase";
+import {
+  updatePassword,
+  EmailAuthProvider,
+  reauthenticateWithCredential
+} from "firebase/auth";
+import { doc, setDoc, deleteDoc, getDoc } from "firebase/firestore";
+import { showToast } from "../../../store/toastSlice";
+import { setUser, logout } from "../../../store/authSlice";
+import { loading } from "../../../store/loadingSlice";
+import { uploadFileToFirebase, deleteFileFromFirebase } from "../../../utils/uploadFile";
 
 const Profile = () => {
+  const user = useSelector((state) => state.auth.user);
+  const [isUserPass, setIsUserPass] = useState(false);
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+    reset,
+  } = useForm({
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      phone: ""
+    },
+  });
 
   const {
     watch: watchChangePass,
@@ -23,53 +45,98 @@ const Profile = () => {
     "confirmPassword",
   ]);
 
-  const fileInputRef = useRef(null);
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-
   const confirm = useGlobalConfirm();
   const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(
     getImageUrlGlobal("default_user.png"),
   );
 
+  useEffect(() => {
+    if (user) {
+      const fullName = user.displayName || "";
+      const nameParts = fullName.split(" ").filter(Boolean);
+      reset({
+        firstName: nameParts[0] || "",
+        lastName: nameParts.slice(1).join(" ") || "",
+        phone: user.phoneNumber || "",
+      });
+      if (user.photoURL) {
+        setAvatarPreview(user.photoURL);
+      }
+      if (auth.currentUser && Array.isArray(auth.currentUser.providerData)) {
+        setIsUserPass(
+          auth.currentUser.providerData.some((provider) => provider.providerId === "password")
+        );
+      } else {
+        setIsUserPass(false);
+      }
+    }
+  }, [user, reset]);
+
+
   const handleUpdateProfile = async (data) => {
     const isConfirm = await confirm();
-    if (isConfirm) {
-      // User confirmed
-      console.log("Deleted");
-    } else {
-      // User canceled
-      console.log("Canceled");
+    if (!isConfirm) return;
+    dispatch(loading(true));
+    try {
+      let dataUpdate = {
+        displayName: data.firstName + " " + data.lastName,
+        phoneNumber: data.phone
+      };
+      if (data.image && data.image.length > 0) {
+        if (user.photoURL) {
+          await deleteFileFromFirebase(user.photoURL);
+        }
+        
+        const imageUrl = await uploadFileToFirebase(data.image[0], "avatars");   
+        dataUpdate.photoURL = imageUrl;
+      }
+      const userDocRef = doc(db, "users", user.uid);
+      await setDoc(userDocRef, dataUpdate, { merge: true });
+
+      dispatch(
+        setUser({...dataUpdate, email: user.email, uid: user.uid, photoURL: dataUpdate.photoURL || user.photoURL})
+      );
+      dispatch(showToast({ message: "Profile updated successfully", type: "success" }));
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      dispatch(showToast({ message: "Update profile failed: " + error.message, type: "error" }));
     }
+    dispatch(loading(false))
   };
 
   const handleChangePassword = async (data) => {
     const isConfirm = await confirm();
-    if (isConfirm) {
-      // User confirmed
-      console.log("Deleted");
-    } else {
-      // User canceled
-      console.log("Canceled");
+    if (!isConfirm) return;
+    try {
+      dispatch(loading(true))
+      const credential = EmailAuthProvider.credential(user.email, data.currentPassword);
+      await reauthenticateWithCredential(auth.currentUser, credential);
+      await updatePassword(auth.currentUser, data.newPassword);
+      dispatch(showToast({ message: "Password changed successfully", type: "success" }));
+    } catch (error) {
+      console.error("Error changing password:", error);
+      dispatch(showToast({ message: "Change password failed: " + error.message, type: "error" }));
     }
+    dispatch(loading(false))
   };
 
-  const handleDeleteAccount = () => {
-    if (
-      window.confirm(
-        "Are you sure you want to delete your account? This action cannot be undone.",
-      )
-    ) {
-      console.log("Delete account");
+  const handleDeleteAccount = async () => {
+    try {
+      dispatch(loading(true))
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+      if (userDocSnap.exists()) {
+        await deleteDoc(userDocRef);
+      }
+      await auth.currentUser.delete();
+      dispatch(loading(false))
+      logout();
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      dispatch(showToast({ message: "Account deletion failed. You need to log in again to delete your account.", type: "error" }));
     }
+    setIsModalDeleteOpen(false);
   };
 
   const handelFileChange = (e) => {
@@ -117,7 +184,6 @@ const Profile = () => {
                     <button
                       type="button"
                       className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-dark transition-colors duration-300 mb-2"
-                      onClick={() => fileInputRef.current.click()}
                     >
                       <svg
                         className="w-5 h-5"
@@ -257,10 +323,10 @@ const Profile = () => {
                     type="email"
                     id="email"
                     name="email"
-                    value={formData.email}
                     className="w-full px-4 py-2 border border-black/10 dark:border-white/20 rounded-lg outline-primary focus:outline bg-transparent text-black dark:text-white placeholder-gray-500 dark:text-white dark:focus:border-primary dark:border-white/20"
                     readOnly
                     disabled
+                    value={user?.email || ""}
                   />
                 </div>
                 <div>
@@ -312,127 +378,129 @@ const Profile = () => {
         </div>
 
         {/* Password Section */}
-        <div className="rounded-2xl border border-black/10 dark:border-white/10 p-6 lg:p-8 mb-8 shadow-auth dark:shadow-dark-auth">
-          <h3 className="text-2xl font-semibold text-black dark:text-white mb-6">
-            Password
-          </h3>
+        {isUserPass &&
+          <div className="rounded-2xl border border-black/10 dark:border-white/10 p-6 lg:p-8 mb-8 shadow-auth dark:shadow-dark-auth">
+            <h3 className="text-2xl font-semibold text-black dark:text-white mb-6">
+              Password
+            </h3>
 
-          <form onSubmit={handleSubmitChangePass(handleChangePassword)}>
-            <div className="space-y-6">
-              <div>
-                <label
-                  htmlFor="currentPassword"
-                  className="block text-sm font-medium text-black dark:text-white mb-2"
-                >
-                  Current password
-                </label>
-                <input
-                  type="password"
-                  name="currentPassword"
-                  id="currentPassword"
-                  className={
-                    `w-full px-4 py-2 border border-black/10 dark:border-white/20 rounded-lg outline-primary focus:outline bg-transparent text-black dark:text-white placeholder-gray-500 dark:text-white dark:focus:border-primary dark:border-white/20` +
-                    (errorsChangePass.currentPassword ? " !border-red-500" : "")
-                  }
-                  {...registerChanePass("currentPassword", {
-                    required: newPassword || confirmPassword ? true : false,
-                  })}
-                />
-                {errorsChangePass.currentPassword && (
-                  <span className="text-red-500 text-xs">
-                    Please enter your current password
-                  </span>
-                )}
+            <form onSubmit={handleSubmitChangePass(handleChangePassword)}>
+              <div className="space-y-6">
+                <div>
+                  <label
+                    htmlFor="currentPassword"
+                    className="block text-sm font-medium text-black dark:text-white mb-2"
+                  >
+                    Current password
+                  </label>
+                  <input
+                    type="password"
+                    name="currentPassword"
+                    id="currentPassword"
+                    className={
+                      `w-full px-4 py-2 border border-black/10 dark:border-white/20 rounded-lg outline-primary focus:outline bg-transparent text-black dark:text-white placeholder-gray-500 dark:text-white dark:focus:border-primary dark:border-white/20` +
+                      (errorsChangePass.currentPassword ? " !border-red-500" : "")
+                    }
+                    {...registerChanePass("currentPassword", {
+                      required: newPassword || confirmPassword ? true : false,
+                    })}
+                  />
+                  {errorsChangePass.currentPassword && (
+                    <span className="text-red-500 text-xs">
+                      Please enter your current password
+                    </span>
+                  )}
+                </div>
+
+                <div className="mt-6">
+                  <label
+                    htmlFor="newPassword"
+                    className="block text-sm font-medium text-black dark:text-white mb-2"
+                  >
+                    New password
+                  </label>
+                  <input
+                    type="password"
+                    name="newPassword"
+                    id="newPassword"
+                    className={
+                      `w-full px-4 py-2 border border-black/10 dark:border-white/20 rounded-lg outline-primary focus:outline bg-transparent text-black dark:text-white placeholder-gray-500 dark:text-white dark:focus:border-primary dark:border-white/20` +
+                      (errorsChangePass?.newPassword ? " !border-red-500" : "")
+                    }
+                    {...registerChanePass("newPassword", {
+                      required:
+                        currentPassword || confirmPassword
+                          ? "New password is required"
+                          : false,
+                      minLength: {
+                        value: 8,
+                        message: "Password must be at least 8 characters long",
+                      },
+                      pattern: {
+                        value: /^(?=.*[A-Z])(?=.*\d).+$/,
+                        message:
+                          "Password must include at least one uppercase letter and one number",
+                      },
+                    })}
+                  />
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                    Your password must have at least 8 characters, include one
+                    uppercase letter, and one number.
+                  </p>
+                  {errorsChangePass.newPassword && (
+                    <span className="text-red-500 text-xs">
+                      {errorsChangePass.newPassword.message}
+                    </span>
+                  )}
+                </div>
+
+                <div className="mt-6">
+                  <label
+                    htmlFor="confirmPassword"
+                    className="block text-sm font-medium text-black dark:text-white mb-2"
+                  >
+                    Confirm password
+                  </label>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    id="confirmPassword"
+                    className={
+                      `w-full px-4 py-2 border border-black/10 dark:border-white/20 rounded-lg outline-primary focus:outline bg-transparent text-black dark:text-white placeholder-gray-500 dark:text-white dark:focus:border-primary dark:border-white/20` +
+                      (errorsChangePass.confirmPassword ? " !border-red-500" : "")
+                    }
+                    {...registerChanePass("confirmPassword", {
+                      validate: (value) =>
+                        value === newPassword || "Passwords do not match",
+                      required:
+                        currentPassword || newPassword
+                          ? "Confirm password is required"
+                          : false,
+                    })}
+                  />
+                  {errorsChangePass.confirmPassword && (
+                    <span className="text-red-500 text-xs">
+                      {errorsChangePass.confirmPassword.message}
+                    </span>
+                  )}
+                </div>
               </div>
 
-              <div className="mt-6">
-                <label
-                  htmlFor="newPassword"
-                  className="block text-sm font-medium text-black dark:text-white mb-2"
-                >
-                  New password
-                </label>
-                <input
-                  type="password"
-                  name="newPassword"
-                  id="newPassword"
-                  className={
-                    `w-full px-4 py-2 border border-black/10 dark:border-white/20 rounded-lg outline-primary focus:outline bg-transparent text-black dark:text-white placeholder-gray-500 dark:text-white dark:focus:border-primary dark:border-white/20` +
-                    (errorsChangePass?.newPassword ? " !border-red-500" : "")
-                  }
-                  {...registerChanePass("newPassword", {
-                    required:
-                      currentPassword || confirmPassword
-                        ? "New password is required"
-                        : false,
-                    minLength: {
-                      value: 8,
-                      message: "Password must be at least 8 characters long",
-                    },
-                    pattern: {
-                      value: /^(?=.*[A-Z])(?=.*\d).+$/,
-                      message:
-                        "Password must include at least one uppercase letter and one number",
-                    },
-                  })}
-                />
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                  Your password must have at least 8 characters, include one
-                  uppercase letter, and one number.
-                </p>
-                {errorsChangePass.newPassword && (
-                  <span className="text-red-500 text-xs">
-                    {errorsChangePass.newPassword.message}
-                  </span>
-                )}
-              </div>
-
-              <div className="mt-6">
-                <label
-                  htmlFor="confirmPassword"
-                  className="block text-sm font-medium text-black dark:text-white mb-2"
-                >
-                  Confirm password
-                </label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  id="confirmPassword"
-                  className={
-                    `w-full px-4 py-2 border border-black/10 dark:border-white/20 rounded-lg outline-primary focus:outline bg-transparent text-black dark:text-white placeholder-gray-500 dark:text-white dark:focus:border-primary dark:border-white/20` +
-                    (errorsChangePass.confirmPassword ? " !border-red-500" : "")
-                  }
-                  {...registerChanePass("confirmPassword", {
-                    validate: (value) =>
-                      value === newPassword || "Passwords do not match",
-                    required:
-                      currentPassword || newPassword
-                        ? "Confirm password is required"
-                        : false,
-                  })}
-                />
-                {errorsChangePass.confirmPassword && (
-                  <span className="text-red-500 text-xs">
-                    {errorsChangePass.confirmPassword.message}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className={
-                `mt-6 px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-dark transition-colors duration-300` +
-                (currentPassword || newPassword || confirmPassword
-                  ? " cursor-pointer"
-                  : " opacity-50 cursor-not-allowed")
-              }
-              disabled={!(currentPassword || newPassword || confirmPassword)}
-            >
-              Change password
-            </button>
-          </form>
-        </div>
+              <button
+                type="submit"
+                className={
+                  `mt-6 px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-dark transition-colors duration-300` +
+                  (currentPassword || newPassword || confirmPassword
+                    ? " cursor-pointer"
+                    : " opacity-50 cursor-not-allowed")
+                }
+                disabled={!(currentPassword || newPassword || confirmPassword)}
+              >
+                Change password
+              </button>
+            </form>
+          </div>
+        }
 
         {/* Danger Zone */}
         <div className="rounded-2xl dark:border-red-800 p-6 lg:p-8 shadow-auth dark:shadow-dark-auth border !border-red-200">

@@ -1,5 +1,10 @@
 import { useForm } from "react-hook-form";
 import Form from "./__components/Form";
+import { showToast } from '../../../store/toastSlice';
+import { loading } from '../../../store/loadingSlice';
+import { useDispatch } from 'react-redux';
+import { auth } from "../../../firebase";
+import { sendPasswordResetEmail } from "firebase/auth";
 
 const ForgotPassword = () => {
   const {
@@ -7,7 +12,19 @@ const ForgotPassword = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const onSubmit = (data) => console.log(data);
+  const dispatch = useDispatch();
+  const onSubmit = (data) => {
+    dispatch(loading(true));
+    return sendPasswordResetEmail(auth, data.email)
+    .then(() => {
+      dispatch(showToast({ message: 'Email sent! Please check your inbox.', type: 'success' }));
+      dispatch(loading(false));
+    })
+    .catch((error) => {
+      dispatch(showToast({ message: 'Failed to send email. ' + error.message, type: 'error' }));
+      dispatch(loading(false));
+    });
+  };
   
   return (
     <Form isSoicalLogin={false}>

@@ -13,6 +13,7 @@ import ForgotPassword from "../pages/Front/Auth/forgotPassword";
 import BlogDetail from "../pages/Front/Blog/detail";
 import PropertyDetail from "../pages/Front/Property/detail";
 import Profile from "../pages/Front/Profile";
+import PrivateRoute from "./PrivateRoute";
 
 let routes = {
   path: "/",
@@ -29,7 +30,13 @@ let routes = {
     { path: "blogs/:id", element: <BlogDetail />, title: "Blogs | Homely" },
     { path: "not-found", element: <NotFound />, title: "404 Page | Homely" },
     { path: "contactus", element: <Contact />, title: "Contact Us | Homely" },
-    { path: "profile", element: <Profile />, title: "Profile | Homely" },
+    {
+      path: "profile", element: (<PrivateRoute>
+        <Profile />
+      </PrivateRoute>
+      ),
+      title: "Profile | Homely"
+    },
     { path: "*", element: <Navigate to="/not-found" replace /> },
   ],
 }
@@ -38,6 +45,6 @@ categories.map((item) => {
   routes.children.push({ path: item.slug, element: <Properties category={item} />, title: `${item.title} | Homely` })
 })
 
-routes = { ...routes, children: [...routes.children, ]}
+routes = { ...routes, children: [...routes.children,] }
 
 export default routes

@@ -1,6 +1,11 @@
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Form from "./__components/Form";
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../../../store/authSlice';
+import { showToast } from '../../../store/toastSlice';
+import { loading } from '../../../store/loadingSlice';
+import { useEffect } from "react";
 
 const Login = () => {
   const {
@@ -8,7 +13,24 @@ const Login = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const onSubmit = (data) => console.log(data);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { error } = useSelector((state) => state.auth);
+  const onSubmit = async (data) => {
+    dispatch(loading(true))
+    const result = await dispatch(loginUser({ email: data.email, password: data.password }));
+    if (loginUser.fulfilled.match(result)) {
+      dispatch(showToast({ message: 'Login successful!', type: 'success' }));
+      navigate('/profile');
+    }
+    dispatch(loading(false))
+  };
+
+  useEffect(() => {
+    if (error) {
+      dispatch(showToast({ message: 'Login Faild', type: 'error' }));
+    }
+  }, [error, dispatch]);
   
   return (
     <Form>

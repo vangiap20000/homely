@@ -1,22 +1,24 @@
 import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react";
-import { getImageUrlFront } from "../../../utils/getAssets";
+import { getImageUrlFront, getImageUrlGlobal } from "../../../utils/getAssets";
 import Sidebar from "./Siderbar"
+import { useSelector } from 'react-redux';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(localStorage.theme === "dark");
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const user = useSelector((state) => state.auth.user);
 
   const handleScroll = () => {
     setIsScrolled(window.scrollY > 82);
   };
-  
+
   useEffect(() => {
-      window.addEventListener("scroll", handleScroll);
-      window.addEventListener("load", handleScroll);   
-    }, [])
+    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("load", handleScroll);
+  }, [])
 
   useEffect(() => {
     handelSetTheme();
@@ -33,7 +35,7 @@ const Header = () => {
     documentElement.classList.toggle(
       "dark",
       localStorage.theme === "dark" ||
-        (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches),
+      (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches),
     );
     documentElement.style.colorScheme = localStorage.theme
   }
@@ -45,10 +47,10 @@ const Header = () => {
   const closeSidebar = () => {
     setIsOpen(false)
   }
-  
+
   return (
-    <header className={`fixed h-24 py-1 z-50 w-full bg-transparent transition-all duration-300 lg:px-0 px-4 ${isScrolled ? 'top-3': 'top-0'}`}>
-      <nav className={`container mx-auto max-w-8xl flex items-center justify-between py-4 duration-300 ${isScrolled ? 'shadow-lg bg-white dark:bg-dark rounded-full top-5 px-4': 'shadow-none top-0'}`}>
+    <header className={`fixed h-24 py-1 z-50 w-full bg-transparent transition-all duration-300 lg:px-0 px-4 ${isScrolled ? 'top-3' : 'top-0'}`}>
+      <nav className={`container mx-auto max-w-8xl flex items-center justify-between py-4 duration-300 ${isScrolled ? 'shadow-lg bg-white dark:bg-dark rounded-full top-5 px-4' : 'shadow-none top-0'}`}>
         <div className="flex justify-between items-center gap-2 w-full">
           <div>
             <Link to="/">
@@ -77,13 +79,13 @@ const Header = () => {
           <div className="flex items-center gap-2 sm:gap-6">
             <button className="hover:cursor-pointer"
               onClick={setDarkMode}
-              >
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 xmlnsXlink="http://www.w3.org/1999/xlink"
                 aria-hidden="true"
                 role="img"
-                className={`iconify iconify--solar dark:hidden block ${location.pathname === '/' && !isScrolled ? 'text-white' : 'text-dark' }`}
+                className={`iconify iconify--solar dark:hidden block ${location.pathname === '/' && !isScrolled ? 'text-white' : 'text-dark'}`}
                 width="32"
                 height="32"
                 viewBox="0 0 24 24"
@@ -115,10 +117,26 @@ const Header = () => {
                 ></path>
               </svg>
             </button>
+            {user &&
+              <Link to="/profile" className="relative group flex items-center justify-center">
+                <img
+                  alt="avatar"
+                  loading="lazy"
+                  width={35}
+                  decoding="async"
+                  className="rounded-full w-9 h-9"
+                  src={user.photoURL ? user.photoURL : getImageUrlGlobal("default_user.png")}
+                  style={{ color: 'transparent' }}
+                />
+                <p className="absolute w-fit text-sm font-medium text-center z-10 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-200 bg-primary dark:bg-middlegreen text-creamwhite py-1 px-2 min-w-28 rounded-xl shadow-2xl top-full left-1/2 transform -translate-x-1/2 mt-3">
+                  { user.displayName || user.email }
+                </p>
+              </Link>
+            }
             <div className="hidden md:block">
               <Link
                 to="#"
-                className={`text-base text-inherit flex items-center gap-2 border-r pr-6 hover:text-primary ${location.pathname === '/' && !isScrolled ? 'text-white' : 'text-dark' }`}
+                className={`text-base text-inherit flex items-center gap-2 border-r pr-6 hover:text-primary ${location.pathname === '/' && !isScrolled ? 'text-white' : 'text-dark'}`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -139,12 +157,12 @@ const Header = () => {
               </Link>
             </div>
             <div>
-              <button 
-                className={`flex items-center gap-3 p-2 sm:px-5 sm:py-3 rounded-full font-semibold hover:cursor-pointer border ${location.pathname === '/' && !isScrolled 
-                  ? 'text-dark bg-white dark:text-dark hover:bg-transparent hover:text-white border-white' 
+              <button
+                className={`flex items-center gap-3 p-2 sm:px-5 sm:py-3 rounded-full font-semibold hover:cursor-pointer border ${location.pathname === '/' && !isScrolled
+                  ? 'text-dark bg-white dark:text-dark hover:bg-transparent hover:text-white border-white'
                   : 'bg-dark text-white hover:bg-transparent hover:text-dark dark:bg-white dark:text-dark dark:hover:bg-transparent dark:hover:text-white duration-300'}`}
                 onClick={openSidebar}
-                >
+              >
                 <span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -168,7 +186,7 @@ const Header = () => {
           </div>
         </div>
       </nav>
-      <Sidebar open={isOpen} close={closeSidebar}  />
+      <Sidebar open={isOpen} close={closeSidebar} />
     </header>
   );
 };
